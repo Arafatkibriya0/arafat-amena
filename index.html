@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arafat Terminal</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #05080d;
+    color: #00ff9c;
+    font-family: Consolas, monospace;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+.app {
+    height: 100%;
+    max-width: 600px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 10px;
+}
+
+.header {
+    text-align: center;
+    padding: 12px;
+    background: #0b1519;
+    border: 1px solid #124d3b;
+    border-radius: 12px;
+}
+
+.header h2 {
+    margin: 0;
+    color: #00ffb3;
+    font-size: 21px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 12px #00ff9c66;
+}
+
+.header p {
+    margin: 7px 0 0;
+    color: #829a91;
+    font-size: 11px;
+}
+
+.terminal {
+    flex: 1;
+    min-height: 60px;
+    overflow-y: auto;
+    background: #020504;
+    border: 1px solid #174a38;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: inset 0 0 20px #00ff9c08;
+    scrollbar-width: thin;
+    scrollbar-color: #176c4b #020504;
+}
+
+.line {
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    animation: fade .2s ease-out;
+}
+
+.num {
+    color: #647a71;
+}
+
+.code {
+    color: #65ffb7;
+}
+
+.line:nth-child(3n) .code {
+    color: #62dfff;
+}
+
+@keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.status {
+    color: #8da99d;
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.progress {
+    height: 3px;
+    background: #17251f;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    width: 0%;
+    background: #00ff9c;
+    transition: width .2s;
+}
+
+.display {
+    background: #0a1117;
+    border: 1px solid #1d5c46;
+    border-radius: 10px;
+    color: white;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    letter-spacing: 3px;
+    overflow: hidden;
+}
+
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding-bottom: 3px;
+}
+
+.key {
+    min-height: 38px;
+    border: 1px solid #253c40;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #17222c, #0d141b);
+    color: #f0f7f5;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 2px 0 #030608;
+}
+
+.key:active {
+    background: #14563f;
+    transform: scale(.97);
+}
+
+.enter {
+    background: #08774f;
+    border-color: #00c989;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.clear {
+    color: #ff7c87;
+}
+
+.space {
+    font-size: 11px;
+}
+
+.bottom {
+    text-align: center;
+    color: #536c62;
+    font-size: 10px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+    <div class="header">
+        <h2>ARAFAT TERMINAL</h2>
+        <p>CODING INTERFACE · SYSTEM READY</p>
+    </div>
+
+    <div class="terminal" id="terminal">
+        <div class="line">
+            <span class="code">System initialized...</span>
+        </div>
+        <div class="line">
+            <span class="code">Enter name using keyboard.</span>
+        </div>
+    </div>
+
+    <div class="status">
+        <span id="message">Waiting for input...</span>
+        <span id="counter">0 / 180</span>
+    </div>
+
+    <div class="progress">
+        <div class="bar" id="bar"></div>
+    </div>
+
+    <div class="display" id="display">_</div>
+
+    <div class="keyboard">
+        <button class="key" onclick="press('1')">1</button>
+        <button class="key" onclick="press('2')">2</button>
+        <button class="key" onclick="press('3')">3</button>
+
+        <button class="key" onclick="press('4')">4</button>
+        <button class="key" onclick="press('5')">5</button>
+        <button class="key" onclick="press('6')">6</button>
+
+        <button class="key" onclick="press('7')">7</button>
+        <button class="key" onclick="press('8')">8</button>
+        <button class="key" onclick="press('9')">9</button>
+
+        <button class="key clear" onclick="backspace()">⌫</button>
+        <button class="key" onclick="press('0')">0</button>
+        <button class="key clear" onclick="clearInput()">C</button>
+
+        <button class="key" onclick="press('a')">A</button>
+        <button class="key" onclick="press('r')">R</button>
+        <button class="key" onclick="press('f')">F</button>
+
+        <button class="key" onclick="press('t')">T</button>
+        <button class="key" onclick="press('m')">M</button>
+        <button class="key" onclick="press('e')">E</button>
+
+        <button class="key" onclick="press('n')">N</button>
+        <button class="key" onclick="press('h')">H</button>
+        <button class="key space" onclick="press(' ')">SPACE</button>
+
+        <button class="key enter"
+                onclick="enterName()"
+                style="grid-column: span 3;">
+            ENTER ↵
+        </button>
+    </div>
+
+    <div class="bottom">
+        DESIGNED FOR MOBILE · TERMINAL MODE
+    </div>
+
+</div>
+
+<script>
+let input = "";
+let stage = 0;
+let running = false;
+let timer = null;
+let lineNumber = 0;
+
+const SPEED = 300;
+
+const terminal = document.getElementById("terminal");
+const display = document.getElementById("display");
+const message = document.getElementById("message");
+const counter = document.getElementById("counter");
+const bar = document.getElementById("bar");
+
+function press(value) {
+    if (running || input.length >= 20) return;
+
+    input += value;
+    display.textContent = input || "_";
+}
+
+function clearInput() {
+    if (running) return;
+
+    input = "";
+    display.textContent = "_";
+}
+
+function backspace() {
+    if (running) return;
+
+    input = input.slice(0, -1);
+    display.textContent = input || "_";
+}
+
+function enterName() {
+    if (running) return;
+
+    const name = input.trim().toLowerCase();
+
+    input = "";
+    display.textContent = "_";
+
+    if (stage === 0 && name === "arafat") {
+        stage = 1;
+        startCode("arafat", 180);
+    } else if (stage === 1 && name === "amena") {
+        stage = 2;
+        startCode("amena", 190);
+    } else {
+        message.textContent = "Wrong name! Try again.";
+    }
+}
+
+function makeArafatLine(i) {
+    const examples = [
+        'let pin = ""; // arafat',
+        'function press(number) {',
+        'const correctPin = "3326"; // Arafat',
+        'if (pin.length >= 4) return; // Aaaaaaa',
+        'pin += number; // aaaaaaa',
+        'updateDots(); // aaaaaaa',
+        'const name = "arafat";',
+        'console.log("Arafat");',
+        'let arafat = "aaaaaaaa";',
+        'function arafat() {',
+        'arafat > arafat > arafat',
+        'const user = "Arafat";',
+        'if (arafat) { // aaaaaaaa',
+        'return "arafat";',
+        'loading... aaaaaaaa',
+        'let message = "Arafat";',
+        'arafat += "aaaaaaa";',
+        'system.process("arafat");',
+        'while (arafat) { aaaaaaaa }'
+    ];
+
+    return examples[(i - 1) % examples.length];
+}
+
+function makeAmenaLine(i) {
+    const examples = [
+        'amena',
+        'amena > amna',
+        'amena > amena > amena',
+        'let amena = "amena";',
+        'const name = "amena";',
+        'console.log("amena");',
+        'amena + amena',
+        'function amena() {',
+        'amena > amna > amena',
+        'let amna = "amena";',
+        'amena // aaaaaaaa',
+        'return "amena";',
+        'amena = amena + amna;',
+        'loading... amena',
+        'const amena = "amena";',
+        'amena > amena > amna',
+        'process("amena");',
+        'amena += "amena";'
+    ];
+
+    return examples[(i - 1) % examples.length];
+}
+
+function addLine(i, text) {
+    const row = document.createElement("div");
+    row.className = "line";
+
+    const num = document.createElement("span");
+    num.className = "num";
+    num.textContent = i + ". ";
+
+    const code = document.createElement("span");
+    code.className = "code";
+    code.textContent = text;
+
+    row.appendChild(num);
+    row.appendChild(code);
+    terminal.appendChild(row);
+
+    // Keep the screen smooth during long scrolling.
+    while (terminal.children.length > 220) {
+        terminal.removeChild(terminal.firstChild);
+    }
+
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
+function startCode(type, total) {
+    running = true;
+    lineNumber = 0;
+
+    terminal.innerHTML = "";
+    bar.style.width = "0%";
+    counter.textContent = "0 / " + total;
+    message.textContent = type.toUpperCase() + " CODE RUNNING...";
+
+    timer = setInterval(function() {
+        lineNumber++;
+
+        const code = type === "arafat"
+            ? makeArafatLine(lineNumber)
+            : makeAmenaLine(lineNumber);
+
+        addLine(lineNumber, code);
+
+        counter.textContent = lineNumber + " / " + total;
+        bar.style.width = (lineNumber / total * 100) + "%";
+
+        if (lineNumber >= total) {
+            clearInterval(timer);
+            timer = null;
+            running = false;
+
+            message.textContent = type === "arafat"
+                ? "Completed! Type AMENA next."
+                : "Amena code completed!";
+        }
+    }, SPEED);
+}
+</script>
+
+</body>
+</html>
